@@ -69,7 +69,7 @@ jobs:
       - working-directory: "${{ matrix.package }}"
         if: "steps.wheel_up_to_date.outputs.skip_build != 'true'"
         run: | # Activate emsdk and build with pyodide
-          cd emsdk && PYODIDE_EMSCRIPTEN_VERSION=$(pyodide config get emscripten_version) && ./emsdk install ${PYODIDE_EMSCRIPTEN_VERSION} && ./emsdk activate ${PYODIDE_EMSCRIPTEN_VERSION} && source emsdk_env.sh && cd ..
+          cd emsdk && PYODIDE_EMSCRIPTEN_VERSION=$(pyodide config get emscripten_version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -1) && ./emsdk install ${PYODIDE_EMSCRIPTEN_VERSION} && ./emsdk activate ${PYODIDE_EMSCRIPTEN_VERSION} && source emsdk_env.sh && cd ..
           pyodide build ${{ matrix.pyodide_args }}
         env:
           SKBUILD_CMAKE_BUILD_TYPE: "${{ matrix.build_type }}"
