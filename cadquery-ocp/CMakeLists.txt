@@ -168,6 +168,19 @@ endforeach()
 string(REPLACE ";" " " BUILD_TOOLKITS_C "${BUILD_TOOLKITS}")
 message(STATUS "-DOpenCASCADE_LIBRARIES=\\\"${BUILD_TOOLKITS_C}\\\"")
 
+if(EMSCRIPTEN)
+  # wasm-ld in Emscripten 3.1.58 (LLVM 18) doesn't support --allow-multiple-definition.
+  # CMake's transitive dependency resolution duplicates OCCT static libraries in the link
+  # line, causing "duplicate symbol" errors. Since all OCCT libraries are already listed
+  # directly via ${OpenCASCADE_LIBRARIES}, clear transitive deps to prevent duplication.
+  foreach(__TK ${BUILD_TOOLKITS})
+    if(TARGET ${__TK})
+      set_property(TARGET ${__TK} PROPERTY INTERFACE_LINK_LIBRARIES "")
+    endif()
+  endforeach()
+  message(STATUS "Cleared OCCT transitive link deps for wasm-ld compatibility")
+endif()
+
 # ##### OCP #####
 FetchContent_Declare(
   OCP
