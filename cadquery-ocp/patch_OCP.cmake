@@ -66,6 +66,8 @@ string(REGEX REPLACE "([ \t]+)(INTERPROCEDURAL_OPTIMIZATION[ \t]+FALSE)" "\\1#[[
 string(REGEX REPLACE "(target_include_directories\\([ \t]?[^ )]+[ \t]?[^ )]+[ \t]?[^ )]+[ \t]?)+\\)" "\\1 \"${OpenCASCADE_BINARY_DIR}/include/opencascade\" \"${rapidjson_SOURCE_DIR}/include\")" content "${content}")
 string(REGEX REPLACE "(\ntarget_link_libraries\\([ \t]?[^ )]+[ \t]?[^ )]+[ \t]?[^ )]+[ \t]?)\\)" "\\1 ${OpenCASCADE_LIBRARIES} freetype)" content "${content}")
 string(REGEX REPLACE "SET\\(PYTHON_SP_DIR \\\"site-packages\\\"" "SET(PYTHON_SP_DIR \".\"" content "${content}")
+# Remove --allow-multiple-definition linker flag (wasm-ld doesn't support it)
+string(REGEX REPLACE "target_link_options\\([^)]*allow-multiple-definition[^)]*\\)" "" content "${content}")
 if(NOT content MATCHES ".*SKBUILD_SOABI.*")
     string(APPEND content "\nset_property(TARGET OCP PROPERTY SUFFIX \".\${SKBUILD_SOABI}\${CMAKE_SHARED_MODULE_SUFFIX}\")")
 endif()

@@ -41,13 +41,6 @@ if(NOT _IS_DEBUG AND ENABLE_IPO)
 endif()
 
 if(EMSCRIPTEN)
-  # Remove --allow-multiple-definition flag which wasm-ld doesn't support
-  # This flag may be injected by pyodide-build's CMake toolchain
-  string(REPLACE "-Xlinker --allow-multiple-definition" "" CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}")
-  string(REPLACE "-Xlinker --allow-multiple-definition" "" CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS}")
-  string(REPLACE "-Xlinker --allow-multiple-definition" "" CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS}")
-  message(STATUS "Cleaned linker flags for wasm-ld compatibility")
-  
   # XXX: The build tries to link the following libraries, so they must be available (they are cached by emscripten)
   message(STATUS "Prebuilding emscripten core dependencies")
   # Note: For Emscripten 3.1.58 (Pyodide 0.27.x), use old library names without -legacysjlj suffix
