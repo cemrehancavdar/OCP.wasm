@@ -62,3 +62,19 @@ if(NOT content STREQUAL content_old)
   file(WRITE "${tkmath_packages}" "${content}")
   message(STATUS "Patched TKMath/PACKAGES to include Expr and ExprIntrp")
 endif()
+
+# ----- Patch XBRepMesh.cxx: remove DISCRETPLUGIN macro to avoid duplicate DISCRETALGO symbol -----
+# Both BRepMesh_IncrementalMesh.cxx (TKMesh) and XBRepMesh.cxx (TKXMesh) invoke DISCRETPLUGIN(),
+# which defines an extern "C" DISCRETALGO() function. This causes a duplicate symbol error with
+# wasm-ld (LLVM 18) which doesn't support --allow-multiple-definition.
+# The DISCRETALGO C export is an OCCT plugin mechanism not needed for static WASM linking.
+set(xbrepmesh_cxx "${REAL_SOURCE_DIR}/src/XBRepMesh/XBRepMesh.cxx")
+if(EXISTS "${xbrepmesh_cxx}")
+  file(READ "${xbrepmesh_cxx}" content)
+  set(content_old "${content}")
+  string(REGEX REPLACE "DISCRETPLUGIN\\([^)]*\\)" "// DISCRETPLUGIN removed for wasm-ld compatibility" content "${content}")
+  if(NOT content STREQUAL content_old)
+    file(WRITE "${xbrepmesh_cxx}" "${content}")
+    message(STATUS "Patched XBRepMesh.cxx: removed DISCRETPLUGIN to avoid duplicate DISCRETALGO symbol")
+  endif()
+endif()
