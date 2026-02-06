@@ -25,6 +25,7 @@ jobs:
           - package: "cadquery-ocp"
             build_type: "Release"
             ldflags: "-O1" # XXX: See repair_wasm.py invocation in CMakeLists.txt
+            parallel_level: "2"  # Limit parallelism to avoid OOM on GitHub runners
           - package: "cadquery-ocp"
             build_type: "Debug"
             ldflags: "-Og -g -gsource-map=inline -gseparate-dwarf" # Smaller debug files, default is too big for CI
@@ -74,6 +75,7 @@ jobs:
         env:
           SKBUILD_CMAKE_BUILD_TYPE: "${{ matrix.build_type }}"
           SKBUILD_BUILD_TOOL_ARGS: "-d;explain;-v" # Useful to debug if caches are not working as expected
+          CMAKE_BUILD_PARALLEL_LEVEL: "${{ matrix.parallel_level || '4' }}"  # Limit parallelism (Release=2 to avoid OOM)
           CFLAGS: "${{ matrix.cflags }}"
           CXXFLAGS: "${{ matrix.cxxflags }}"
           LDFLAGS: "${{ matrix.ldflags }}"
